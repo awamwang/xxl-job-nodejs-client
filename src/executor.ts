@@ -46,7 +46,7 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
     const url = `${scheduleCenterUrl}/api/registryRemove`
     const res = await request(url, { method: 'POST', data, headers })
     if (res.data)
-      logger.info(`Registry info: ${JSON.stringify(res.data)}`)
+      logger.info(`Registry remove info: ${JSON.stringify(res.data)}`)
     else
       logger.error(`Registry failed: ${JSON.stringify(res)}`)
   }

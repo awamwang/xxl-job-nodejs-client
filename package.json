@@ -41,12 +41,14 @@
   ],
   "scripts": {
     "build": "unbuild",
+    "build:watch": "nodemon --watch ./src -e ts --exec 'unbuild'",
     "dev": "unbuild --stub",
     "lint": "eslint .",
     "prepublishOnly": "nr build",
     "release": "bumpp && npm publish",
-    "start": "esno src/index.ts",
-    "play:express": "esno watch example/express",
+    "start": "tsx src/index.ts",
+    "play:express": "tsx watch example/express",
+    "dev:express": "pnpm run -F=example dev:xxl",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
@@ -63,6 +65,7 @@
     "eslint": "^8.24.0",
     "esno": "^0.16.3",
     "pnpm": "^7.12.2",
+    "tsx": "^3.14.0",
     "typescript": "^4.8.3",
     "unbuild": "^0.8.11"
   }

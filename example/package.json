@@ -1,7 +1,8 @@
 {
   "name": "example",
   "scripts": {
-    "dev": "esno watch express"
+    "dev": "tsx watch express",
+    "dev:xxl": "nodemon --delay 2s --watch ./src --watch ./node_modules/xxl-job -e ts,js,json,cjs,mjs --exec 'ts-node -P ../tsconfig.build.json -r tsconfig-paths/register' express.ts"
   },
   "dependencies": {
     "xxl-job": "workspace:xxl-job@*"
