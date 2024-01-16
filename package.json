@@ -1,5 +1,5 @@
 {
-  "name": "xxl-job",
+  "name": "xxl-job-nodejs",
   "type": "module",
   "version": "0.1.1",
   "packageManager": "pnpm@7.5.2",
