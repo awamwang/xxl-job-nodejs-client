@@ -27,7 +27,8 @@ export function createJobManager<T extends IObject>(context?: T) {
       }, executorTimeout * 1000)
     }
 
-    await jobHandler(logger, request, executorParams, context)
+    // 去掉 await，如果等待异步执行结束，那么这次调度会超时；
+    jobHandler(logger, request, executorParams, context)
       .then(result => finishJob({ logger, result, callback, jobId, logId }))
       .catch(error => finishJob({ logger, callback, jobId, logId, error }))
 

@@ -81,9 +81,12 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
 
   function addRoutes() {
     router.post(`${route}/beat`, async (_, res) => {
-      res.status(200).send({ code: 200, msg: 'Success' })
+      console.log('beat')
+      // 似乎收不到心跳
+      res.status(200).send({ code: 200, msg: null })
     })
     router.post(`${route}/idleBeat`, async (req, res) => {
+      console.log('idleBeat')
       const { jobId = -1 } = req.body
       res.status(200).send(idleBeat(jobId))
     })
