@@ -1,3 +1,4 @@
+import { EventEmitter } from 'stream'
 import type { Request, Response } from 'express'
 import { Router } from 'express'
 import { createXxlJobLogger } from './logger'
@@ -6,6 +7,7 @@ import type { ICallBackOptions, IExecutorOptions, IObject, IRunRequest } from '.
 
 export function createXxlJobExecutor<T extends IObject>(options: IExecutorOptions<T>) {
   const router: Router = Router()
+  const eventEmitter = new EventEmitter()
 
   const {
     route = '/job',
@@ -22,7 +24,7 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
   } = options
 
   const { logger, readFromLogId } = createXxlJobLogger(logStorage === 'local' ? logLocalName : undefined)
-  const { runJob, hasJob } = createJobManager(context)
+  const { runJob, hasJob, finishJob } = createJobManager(context)
 
   const data = { registryGroup: 'EXECUTOR', registryKey: executorKey, registryValue: baseUrl + route }
   const headers = { 'xxl-job-access-token': accessToken }
@@ -95,7 +97,7 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
     })
     router.post(`${route}/kill`, async (req, res) => {
       const { jobId = -1 } = req.body
-      res.status(200).send(killJob(jobId))
+      res.status(200).send(await killJob(jobId))
     })
     router.post(`${route}/log`, async (req, res) => {
       const { logId, fromLineNum, logDateTim } = req.body
@@ -116,8 +118,23 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
     return hasJob(jobId) ? { code: 500, msg: 'busy' } : { code: 200, msg: 'idle' }
   }
 
-  function killJob(jobId: any): any {
-    return { code: 500, msg: `Not yet support, jobId: ${jobId}` }
+  async function killJob(jobId: any) {
+    // await finishJob({ jobId, error: new Error(`Job Task: ${jobId} is killed.`) })
+    async function func() {
+      eventEmitter.emit('jobKilled', {
+        id: jobId
+      })
+    }
+
+    if (hasJob(jobId)) {
+      finishJob({ jobId, func, result: `Job Task: ${jobId} is killed.` })
+      return { code: 200, msg: null }
+    }
+    else {
+      return { code: 200, msg: 'job thread already killed.' }
+    }
+
+    // return { code: 500, msg: `Not yet support, jobId: ${jobId}` }
   }
 
   async function readLog(logId: number, _fromLineNum: number, logDateTim: number) {
@@ -157,9 +174,10 @@ export function createXxlJobExecutor<T extends IObject>(options: IExecutorOption
   }
 
   return {
-    cancel,
     initialization,
-    applyMiddleware
+    cancel,
+    applyMiddleware,
+    eventEmitter
   }
 }
 

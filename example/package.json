@@ -2,9 +2,9 @@
   "name": "example",
   "scripts": {
     "dev": "tsx watch express",
-    "dev:xxl": "nodemon --delay 2s --watch ./src --watch ./node_modules/xxl-job -e ts,js,json,cjs,mjs --exec 'ts-node -P ../tsconfig.build.json -r tsconfig-paths/register' express.ts"
+    "dev:xxl": "nodemon --delay 2s --watch ./src --watch ./node_modules/xxl-job-nodejs -e ts,js,json,cjs,mjs --exec 'ts-node -P ../tsconfig.build.json -r tsconfig-paths/register' express.ts"
   },
   "dependencies": {
-    "xxl-job": "workspace:xxl-job@*"
+    "xxl-job-nodejs": "workspace:xxl-job-nodejs@*"
   }
 }
