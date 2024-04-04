@@ -20,10 +20,10 @@ app.listen(9999, () => {
     app,
     jobHandlers,
     appType: 'express',
-    baseUrl: 'http://192.168.3.38:9999',
-    accessToken: 'default_token',
-    executorKey: 'executor-nodejs-express',
-    scheduleCenterUrl: 'http://127.0.0.1:8080/xxl-job-admin',
+    baseUrl: 'http://172.24.137.85:19999',
+    accessToken: '%TGB6yhn123',
+    executorKey: 'xxl-job-PC1',
+    scheduleCenterUrl: 'http://47.108.170.75:18080/xxl-job-admin',
     logStorage: 'local',
   })
   xxlJobExecutor.initialization()

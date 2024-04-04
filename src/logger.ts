@@ -21,20 +21,21 @@ export function createXxlJobLogger(localName?: string) {
     ]
   })
 
-  const filename = `logs/${localName}-${new Date().getMonth()}-${new Date().getDate()}.log`
+  const filename = `logs/${localName}-${new Date().getMonth() + 1}-${new Date().getDate()}.log`
   if (localName)
-    logger.add(new transports.File({ filename }))
+    logger.add(new transports.File({ filename, maxsize: 1024 * 1024 * 10, maxFiles: 10 }))
 
   async function readFromLogId(logId: number, fromLineNum: number, logDateTim: number): LogRead {
+    logger.debug(`readFromLogId, logId:${logId}, fromLineNum:${fromLineNum}, logDateTim:${logDateTim}`)
     return new Promise((resolve) => {
       if (foundMap.has(logId)) {
         resolve({ content: foundMap.get(logId)!, fromLineNum, lineNum: fromLineNum, findFlag: true, endFlag: true })
         return
       }
 
-      const logFile = `logs/${localName}-${new Date(logDateTim).getMonth()}-${new Date(logDateTim).getDate()}.log`
+      const logFile = `logs/${localName}-${new Date(logDateTim).getMonth() + 1}-${new Date(logDateTim).getDate()}.log`
       if (!existsSync(logFile)) {
-        logger.error(`Log file does not exist or has been cleaned, logId:${logId}`)
+        logger.error(`Log file does not exist or has been cleaned, logId:${logId}, logFile:${logFile}`)
         resolve({ findFlag: false, endFlag: true })
         return
       }
@@ -50,7 +51,8 @@ export function createXxlJobLogger(localName?: string) {
 
       rl.on('line', (line) => {
         if (lineNum > fromLineNum)
-          lineNum = fromLineNum
+          // lineNum = fromLineNum
+          lineNum--
         if (start.test(line))
           findFlag = true
         if (findFlag) {

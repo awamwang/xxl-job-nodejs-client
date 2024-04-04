@@ -4,7 +4,7 @@
   "version": "0.1.2",
   "packageManager": "pnpm@7.5.2",
   "description": "Provide xxl-job SDK for NodeJs.",
-  "author": "ikexing <ikexing@qq.com>",
+  "author": "Awam M Wang",
   "license": "MIT",
   "homepage": "https://github.com/ikexing-cn/xxl-job-nodejs#readme",
   "repository": {
