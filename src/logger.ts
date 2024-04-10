@@ -1,6 +1,7 @@
 import { createReadStream, existsSync } from 'node:fs'
 import { createInterface } from 'node:readline'
 import { createLogger, format, transports } from 'winston'
+import DailyRotateFile from 'winston-daily-rotate-file'
 import type { LogRead } from './'
 const { combine, timestamp, printf } = format
 
@@ -21,9 +22,21 @@ export function createXxlJobLogger(localName?: string) {
     ]
   })
 
-  const filename = `logs/${localName}-${new Date().getMonth() + 1}-${new Date().getDate()}.log`
+  // const filename = `logs/${localName}-${new Date().getMonth() + 1}-${new Date().getDate()}.log`
+  const filename = `logs/${localName}-%DATE%.log`
+  const logFileTransport = new DailyRotateFile({ filename, maxFiles: '10d', datePattern: 'YYYY-MM-DD', maxSize: '10m' })
+  let newFilename = logFileTransport.filename
+  logFileTransport.on('new', (newName) => {
+    newFilename = newName
+    logger.info(`Log file created, newName:${newFilename}`)
+  })
+  logFileTransport.on('rotate', (_oldName, newName) => {
+    newFilename = newName
+    logger.info(`Log file rotate, newName:${newFilename}`)
+  })
   if (localName)
-    logger.add(new transports.File({ filename, maxsize: 1024 * 1024 * 10, maxFiles: 10 }))
+    // logger.add(new transports.File({ filename, maxsize: 1024 * 1024 * 10, maxFiles: 10 }))
+    logger.add(logFileTransport)
 
   async function readFromLogId(logId: number, fromLineNum: number, logDateTim: number): LogRead {
     logger.debug(`readFromLogId, logId:${logId}, fromLineNum:${fromLineNum}, logDateTim:${logDateTim}`)
@@ -33,14 +46,14 @@ export function createXxlJobLogger(localName?: string) {
         return
       }
 
-      const logFile = `logs/${localName}-${new Date(logDateTim).getMonth() + 1}-${new Date(logDateTim).getDate()}.log`
-      if (!existsSync(logFile)) {
-        logger.error(`Log file does not exist or has been cleaned, logId:${logId}, logFile:${logFile}`)
+      // const logFile = `logs/${localName}-${new Date(logDateTim).getMonth() + 1}-${new Date(logDateTim).getDate()}.log`
+      if (!existsSync(newFilename)) {
+        logger.error(`Log file does not exist or has been cleaned, logId:${logId}, logFile:${newFilename}`)
         resolve({ findFlag: false, endFlag: true })
         return
       }
 
-      const stream = createReadStream(filename)
+      const stream = createReadStream(newFilename)
       const rl = createInterface({ input: stream })
       let lineNum = 0
       let content = ''
